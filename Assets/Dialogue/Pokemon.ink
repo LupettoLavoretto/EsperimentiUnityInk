@@ -7,7 +7,7 @@ Which pokemon do you choose?
 + [Bulbasaur]
     -> chosen("Bulbasaur")
 + [Squirtle]
-    -> chosen("Charmander")
+    -> chosen("Squirtle")
     
 === chosen(pokemon) ===
 You chose {pokemon}!

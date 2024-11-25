@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using Ink.Runtime;
+using UnityEngine.EventSystems;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -121,7 +122,23 @@ public void EnterDialogueMode(TextAsset inkJSON)
       choices[i].gameObject.SetActive(false);  
     }
 
+    StartCoroutine(SelectFirstChoice());
 
     }
+
+    private IEnumerator SelectFirstChoice()
+    {
+        //Event System richiede in unity prima di essere svuotato, e poi di aspettare prima di attivare un nuovo elemento
+        EventSystem.current.SetSelectedGameObject(null);
+        yield return new WaitForEndOfFrame();
+        EventSystem.current.SetSelectedGameObject(choices[0].gameObject);
+
+    }
+
+    public void MakeChoice(int choiceIndex)
+    {
+        currentStory.ChooseChoiceIndex(choiceIndex);
+    }
+
 }
 
