@@ -1703,7 +1703,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1869931e994344d429be8315a1a6846d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  typingSpeed: 0.04
   dialoguePanel: {fileID: 517114990}
+  continueIcon: {fileID: 662024990}
   dialogueText: {fileID: 1899561647}
   displayNameText: {fileID: 850785692}
   portraitAnimator: {fileID: 1867600897}
