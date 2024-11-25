@@ -80,6 +80,12 @@ public void EnterDialogueMode(TextAsset inkJSON)
     dialogueIsPlaying = true;
     dialoguePanel.SetActive(true);
 
+    //reset portrait, layout, and speaker
+    displayNameText.text = "???";
+    portraitAnimator.Play("default");
+    layoutAnimator.Play("right");
+
+
     ContinueStory();
 
 }
