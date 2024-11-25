@@ -969,7 +969,7 @@ PrefabInstance:
       objectReference: {fileID: 4900000, guid: 582cee8193efa9242936efc5d7a868ad, type: 3}
     - target: {fileID: 4163198518835353636, guid: 798cc5d1fa548d548821a869f176413e, type: 3}
       propertyPath: m_Name
-      value: NPC (1)
+      value: DrGreen
       objectReference: {fileID: 0}
     - target: {fileID: 4163198518835353637, guid: 798cc5d1fa548d548821a869f176413e, type: 3}
       propertyPath: m_RootOrder
@@ -2566,7 +2566,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4163198518835353636, guid: 798cc5d1fa548d548821a869f176413e, type: 3}
       propertyPath: m_Name
-      value: NPC
+      value: MsYellow
       objectReference: {fileID: 0}
     - target: {fileID: 4163198518835353637, guid: 798cc5d1fa548d548821a869f176413e, type: 3}
       propertyPath: m_RootOrder

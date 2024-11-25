@@ -7,8 +7,14 @@ using UnityEngine.EventSystems;
 
 public class DialogueManager : MonoBehaviour
 {
+
+[Header("Parametri")]
+[SerializeField] private float typingSpeed = 0.04f;
+
 [Header("Dialogue UI")]
 [SerializeField] private GameObject dialoguePanel;
+[SerializeField] private GameObject continueIcon;
+
 [SerializeField] private TextMeshProUGUI dialogueText;
 [SerializeField] private TextMeshProUGUI displayNameText;
 [SerializeField] private Animator portraitAnimator;
@@ -22,10 +28,13 @@ private Story currentStory;
 
 public bool dialogueIsPlaying {get; private set;}
 
+private bool canContinueToNextLine = false;
+
 private const string SPEAKER_TAG = "speaker";
 private const string PORTRAIT_TAG = "portrait";
 private const string LAYOUT_TAG = "layout";
 
+private Coroutine displayLineCoroutine;
 
 private static DialogueManager instance;
 private void Awake()
@@ -67,7 +76,9 @@ private void Update()
         return;
     }
     //Se la giocatrice clicca il tasto per avanzare, la storia avanza
-    if (InputManager.GetInstance().GetSubmitPressed())
+    if (canContinueToNextLine && 
+    currentStory.currentChoices.Count ==0 
+    && InputManager.GetInstance().GetSubmitPressed())
     {
         ContinueStory();
     }
@@ -102,9 +113,16 @@ public void EnterDialogueMode(TextAsset inkJSON)
     {
             if (currentStory.canContinue)
     {
-        dialogueText.text = currentStory.Continue();
-        // mostra le scelte, se esistono, per questa linea di dialogo
-        DisplayChoices();
+        //set text for current dialogue line
+        if (displayLineCoroutine != null)
+        {
+            StopCoroutine(displayLineCoroutine);
+        }
+        
+        displayLineCoroutine = StartCoroutine(DisplayLine(currentStory.Continue()));
+        
+
+
         HandleTags(currentStory.currentTags);
 
     }
@@ -113,6 +131,65 @@ public void EnterDialogueMode(TextAsset inkJSON)
         //Se non c'è testo, esci dal dialogo
         StartCoroutine(ExitDialogueMode());
     }
+    }
+
+    private IEnumerator DisplayLine(string line)
+    {
+        //empty the dialogue text
+        dialogueText.text = "";
+        continueIcon.SetActive(false);
+        HideChoices();
+
+        canContinueToNextLine = false;
+
+        bool isAddingRichTextTag = false;
+
+        //display each Letter one at a time
+        foreach (char letter in line.ToCharArray()
+        )
+        {
+            //se il player clicca il tasto submit, la riga viene mostrata per intero
+            if (InputManager.GetInstance().GetSubmitPressed())
+            {
+                dialogueText.text = line;
+                break;
+            }
+            //check for rich text tag, if found, add it without waiting
+            if (letter == '<'|| isAddingRichTextTag)
+            {
+                isAddingRichTextTag = true;
+                dialogueText.text += letter;
+                if (letter == '>')
+                {
+                    isAddingRichTextTag = false;
+                }
+            
+
+            }
+            //if not rich text, add the next letter and wait a small time
+            else
+            {
+                dialogueText.text += letter;
+                yield return new WaitForSeconds(typingSpeed);
+            }
+
+
+
+        }
+        continueIcon.SetActive(true);
+        // mostra le scelte, se esistono, per questa linea di dialogo
+        DisplayChoices();
+
+        canContinueToNextLine = true;
+
+    }
+
+    private void HideChoices()
+    {
+        foreach (GameObject choiceButton in choices)
+        {
+            choiceButton.SetActive(false);
+        }
     }
 
     private void HandleTags(List<string> currentTags)
@@ -194,7 +271,13 @@ public void EnterDialogueMode(TextAsset inkJSON)
 
     public void MakeChoice(int choiceIndex)
     {
-        currentStory.ChooseChoiceIndex(choiceIndex);
+        if (canContinueToNextLine)
+        {
+            currentStory.ChooseChoiceIndex(choiceIndex);
+            InputManager.GetInstance().RegisterSubmitPressed();
+            ContinueStory();
+        }
+        
     }
 
 }
