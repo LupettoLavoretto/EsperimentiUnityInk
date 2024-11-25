@@ -10,6 +10,10 @@ public class DialogueManager : MonoBehaviour
 [SerializeField] private GameObject dialoguePanel;
 [SerializeField] private TextMeshProUGUI dialogueText;
 
+[Header("Choices UI")]
+[SerializeField] private GameObject[] choices;
+private TextMeshProUGUI[] choicesText;
+
 private Story currentStory;
 
 public bool dialogueIsPlaying {get; private set;}
@@ -34,6 +38,16 @@ private void Start()
 {
     dialogueIsPlaying = false;
     dialoguePanel.SetActive(false);
+
+    //prendi tutte le scelte testuali
+    choicesText = new TextMeshProUGUI[choices.Length];
+    int index = 0;
+    foreach (GameObject choice in choices)
+    {
+        choicesText[index] = choice.GetComponentInChildren<TextMeshProUGUI>();
+        index ++;
+    }
+
 }
 
 private void Update()
@@ -73,12 +87,41 @@ public void EnterDialogueMode(TextAsset inkJSON)
             if (currentStory.canContinue)
     {
         dialogueText.text = currentStory.Continue();
+        // mostra le scelte, se esistono, per questa linea di dialogo
+        DisplayChoices();
     }
     else
     {
         //Se non c'è testo, esci dal dialogo
         StartCoroutine(ExitDialogueMode());
     }
+    }
+
+    private void DisplayChoices()
+    {
+        List<Choice> currentChoices = currentStory.currentChoices;
+
+        //Un defensive check per vedere se abbiamo troppe scelte rispetto alle opzioni strutturate nella UI
+        if (currentChoices.Count > choices.Length)
+        {
+            Debug.LogError("Ci sono più scelte di quante la UI possa supportare. Le scelte presenti sono:" + currentChoices.Count);
+        }
+
+    int index = 0;
+    foreach (Choice choice in currentChoices)
+    {
+        choices[index].gameObject.SetActive(true);
+        choicesText[index].text = choice.text;
+        index ++;
+    }
+
+    //non ho capito benissimo cosa faccia
+    for (int i = index; i < choices.Length; i++)
+    {
+      choices[i].gameObject.SetActive(false);  
+    }
+
+
     }
 }
 
