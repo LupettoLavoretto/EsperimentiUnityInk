@@ -10,6 +10,7 @@ public class DialogueManager : MonoBehaviour
 [Header("Dialogue UI")]
 [SerializeField] private GameObject dialoguePanel;
 [SerializeField] private TextMeshProUGUI dialogueText;
+[SerializeField] private TextMeshProUGUI displayNameText;
 
 [Header("Choices UI")]
 [SerializeField] private GameObject[] choices;
@@ -18,6 +19,11 @@ private TextMeshProUGUI[] choicesText;
 private Story currentStory;
 
 public bool dialogueIsPlaying {get; private set;}
+
+private const string SPEAKER_TAG = "speaker";
+private const string PORTRAIT_TAG = "portrait";
+
+private const string LAYOUT_TAG = "layout";
 
 
 private static DialogueManager instance;
@@ -90,6 +96,8 @@ public void EnterDialogueMode(TextAsset inkJSON)
         dialogueText.text = currentStory.Continue();
         // mostra le scelte, se esistono, per questa linea di dialogo
         DisplayChoices();
+        HandleTags(currentStory.currentTags);
+
     }
     else
     {
@@ -97,6 +105,44 @@ public void EnterDialogueMode(TextAsset inkJSON)
         StartCoroutine(ExitDialogueMode());
     }
     }
+
+    private void HandleTags(List<string> currentTags)
+    {
+        //Looppa per ogni tag e gestiscili di conseguenza
+        foreach (string tag in currentTags)
+        {
+            //parse the tag: in questo modo dividiamo la formula key:value (es: portrait:dr_green_neutral) in due elementi scissi
+            string[] splitTag = tag.Split(':');
+            if (splitTag.Length !=2)
+            {
+                Debug.LogError("Tag could not be appropriately parsed" + tag);
+            }
+            //in questo credo due tag dall'elemento splittato
+            //Trim cancella gli spazi vuoti
+            string tagKey = splitTag[0].Trim();
+            string tagValue = splitTag[1].Trim();
+
+            switch (tagKey)
+            {
+                case SPEAKER_TAG:
+                    displayNameText.text = tagValue;
+                    break;
+                case PORTRAIT_TAG:
+                Debug.Log("portrait=" + tagValue);
+                    break;
+                case LAYOUT_TAG:
+                Debug.Log("layout=" + tagValue);
+                    break;
+                default:
+                    Debug.LogWarning("Tag came in but is not currently being handled:" + tag);
+                    break;      
+
+            }
+
+
+        }
+    }
+
 
     private void DisplayChoices()
     {
