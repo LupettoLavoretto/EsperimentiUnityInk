@@ -11,6 +11,8 @@ public class DialogueManager : MonoBehaviour
 [SerializeField] private GameObject dialoguePanel;
 [SerializeField] private TextMeshProUGUI dialogueText;
 [SerializeField] private TextMeshProUGUI displayNameText;
+[SerializeField] private Animator portraitAnimator;
+private Animator layoutAnimator;
 
 [Header("Choices UI")]
 [SerializeField] private GameObject[] choices;
@@ -22,7 +24,6 @@ public bool dialogueIsPlaying {get; private set;}
 
 private const string SPEAKER_TAG = "speaker";
 private const string PORTRAIT_TAG = "portrait";
-
 private const string LAYOUT_TAG = "layout";
 
 
@@ -46,6 +47,8 @@ private void Start()
     dialogueIsPlaying = false;
     dialoguePanel.SetActive(false);
 
+    //get the Layout Animator
+    layoutAnimator = dialoguePanel.GetComponent<Animator>();
     //prendi tutte le scelte testuali
     choicesText = new TextMeshProUGUI[choices.Length];
     int index = 0;
@@ -125,13 +128,15 @@ public void EnterDialogueMode(TextAsset inkJSON)
             switch (tagKey)
             {
                 case SPEAKER_TAG:
+                //Dato che lo speaker è solo testo, gli diciamo di mostrare il testo del nome personaggio
                     displayNameText.text = tagValue;
                     break;
                 case PORTRAIT_TAG:
-                Debug.Log("portrait=" + tagValue);
+                //Play è un metodo che attiva l'animazione, e gli diciamo di attivare l'animazione legata al tag
+                    portraitAnimator.Play(tagValue);
                     break;
                 case LAYOUT_TAG:
-                Debug.Log("layout=" + tagValue);
+                    layoutAnimator.Play(tagValue);
                     break;
                 default:
                     Debug.LogWarning("Tag came in but is not currently being handled:" + tag);
