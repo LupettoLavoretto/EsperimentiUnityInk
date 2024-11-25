@@ -59,8 +59,10 @@ public void EnterDialogueMode(TextAsset inkJSON)
     ContinueStory();
 
 }
-    private void ExitDialogueMode()
+    private IEnumerator ExitDialogueMode()
     {
+        yield return new WaitForSeconds(0.2f);
+
         dialogueIsPlaying = false;
         dialoguePanel.SetActive(false);
         dialogueText.text = "";
@@ -75,7 +77,7 @@ public void EnterDialogueMode(TextAsset inkJSON)
     else
     {
         //Se non c'è testo, esci dal dialogo
-        ExitDialogueMode();
+        StartCoroutine(ExitDialogueMode());
     }
     }
 }
