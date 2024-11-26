@@ -4,7 +4,6 @@ using UnityEngine;
 using TMPro;
 using Ink.Runtime;
 using UnityEngine.EventSystems;
-using Ink.UnityIntegration;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -12,8 +11,8 @@ public class DialogueManager : MonoBehaviour
 [Header("Parametri")]
 [SerializeField] private float typingSpeed = 0.04f;
 
-[Header("Globals Ink File")]
-[SerializeField] private InkFile globalsInkFile;
+[Header("Load Globals JSON")]
+[SerializeField] private TextAsset loadGlobalsJSON;
 
 [Header("Dialogue UI")]
 [SerializeField] private GameObject dialoguePanel;
@@ -51,7 +50,7 @@ private void Awake()
     }
     instance = this;
 
-        dialogueVariables = new DialogueVariables(globalsInkFile.filePath);
+        dialogueVariables = new DialogueVariables(loadGlobalsJSON);
 }
 
 public static DialogueManager GetInstance()
