@@ -99,7 +99,7 @@ private void Update()
         }
     }
 
-public void EnterDialogueMode(TextAsset inkJSON)
+public void EnterDialogueMode(TextAsset inkJSON, Animator emoteAnimator)
     {
         //Qui diciamo ad Unity che quando entriamo in modalità "dialogo" la storia deve venire dal JSON di ink, che il dialogo è attivo e il panel visibile (l'interfaccia dove compare il testo)
         currentStory = new Story(inkJSON.text);
@@ -107,6 +107,18 @@ public void EnterDialogueMode(TextAsset inkJSON)
         dialoguePanel.SetActive(true);
 
             dialogueVariables.StartListening(currentStory);
+
+            currentStory.BindExternalFunction("playEmote", (string emoteName) =>
+            {   if(emoteAnimator != null)
+            {
+                emoteAnimator.Play(emoteName);
+            }
+            else
+            {
+                Debug.LogWarning("Tried to play emote, but emote animator was not initialized when entering dialogue mode");
+            }
+                
+            });
 
         //reset portrait, layout, and speaker
         displayNameText.text = "???";
@@ -122,12 +134,15 @@ private IEnumerator ExitDialogueMode()
         yield return new WaitForSeconds(0.2f);
 
         dialogueVariables.StopListening(currentStory);
+        currentStory.UnbindExternalFunction("playEmote");
 
         dialogueIsPlaying = false;
         dialoguePanel.SetActive(false);
         dialogueText.text = "";
+        
     }
 
+//Questo è il bloccone che di fatto gestisce l'interazione testo tra ink e unity
 private void ContinueStory()
     {
             if (currentStory.canContinue)
@@ -138,11 +153,20 @@ private void ContinueStory()
             StopCoroutine(displayLineCoroutine);
         }
         
-        displayLineCoroutine = StartCoroutine(DisplayLine(currentStory.Continue()));
+        string nextLine = currentStory.Continue();
+
+        if(nextLine.Equals("") && !currentStory.canContinue)
+        {
+            StartCoroutine(ExitDialogueMode());
+        }
+        else
+        {
+            HandleTags(currentStory.currentTags);
+            displayLineCoroutine = StartCoroutine(DisplayLine(nextLine));
+            
         
+        }
 
-
-        HandleTags(currentStory.currentTags);
 
     }
     else

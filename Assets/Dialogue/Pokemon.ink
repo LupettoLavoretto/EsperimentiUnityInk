@@ -1,5 +1,7 @@
 INCLUDE globals.ink
 
+
+
 { pokemon_name == "": -> main| -> alredy_chose}
 
 === main ===
