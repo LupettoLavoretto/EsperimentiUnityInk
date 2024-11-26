@@ -18,4 +18,8 @@ You chose {pokemon}!
 
 === alredy_chose ===
 You already chose {pokemon_name}
+Do you want to change your mind?
+    + No, i'm fine -> END
+    + Yes! -> main
+    -
 -> END

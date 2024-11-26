@@ -147,7 +147,9 @@ public void EnterDialogueMode(TextAsset inkJSON)
     private IEnumerator DisplayLine(string line)
     {
         //empty the dialogue text
-        dialogueText.text = "";
+        dialogueText.text = line;
+        dialogueText.maxVisibleCharacters = 0;
+
         continueIcon.SetActive(false);
         HideChoices();
 
@@ -162,14 +164,13 @@ public void EnterDialogueMode(TextAsset inkJSON)
             //se il player clicca il tasto submit, la riga viene mostrata per intero
             if (InputManager.GetInstance().GetSubmitPressed())
             {
-                dialogueText.text = line;
+                dialogueText.maxVisibleCharacters = line.Length;
                 break;
             }
             //check for rich text tag, if found, add it without waiting
             if (letter == '<'|| isAddingRichTextTag)
             {
                 isAddingRichTextTag = true;
-                dialogueText.text += letter;
                 if (letter == '>')
                 {
                     isAddingRichTextTag = false;
@@ -180,7 +181,7 @@ public void EnterDialogueMode(TextAsset inkJSON)
             //if not rich text, add the next letter and wait a small time
             else
             {
-                dialogueText.text += letter;
+                dialogueText.maxVisibleCharacters ++;
                 yield return new WaitForSeconds(typingSpeed);
             }
 
