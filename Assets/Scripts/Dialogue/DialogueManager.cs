@@ -302,5 +302,13 @@ public void EnterDialogueMode(TextAsset inkJSON)
         return variableValue;
     }
 
+    public void OnApplicationQuit()
+    {
+        if (dialogueVariables != null) {
+            dialogueVariables.SaveVariables();
+        }
+        
+    }
+
 }
 
