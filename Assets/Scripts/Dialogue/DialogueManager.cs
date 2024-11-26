@@ -4,12 +4,16 @@ using UnityEngine;
 using TMPro;
 using Ink.Runtime;
 using UnityEngine.EventSystems;
+using Ink.UnityIntegration;
 
 public class DialogueManager : MonoBehaviour
 {
 
 [Header("Parametri")]
 [SerializeField] private float typingSpeed = 0.04f;
+
+[Header("Globals Ink File")]
+[SerializeField] private InkFile globalsInkFile;
 
 [Header("Dialogue UI")]
 [SerializeField] private GameObject dialoguePanel;
@@ -34,6 +38,8 @@ private const string SPEAKER_TAG = "speaker";
 private const string PORTRAIT_TAG = "portrait";
 private const string LAYOUT_TAG = "layout";
 
+    private DialogueVariables dialogueVariables;
+
 private Coroutine displayLineCoroutine;
 
 private static DialogueManager instance;
@@ -44,6 +50,8 @@ private void Awake()
         Debug.LogWarning("Trovati più di un Dialogue Manager nella scena");
     }
     instance = this;
+
+        dialogueVariables = new DialogueVariables(globalsInkFile.filePath);
 }
 
 public static DialogueManager GetInstance()
@@ -91,6 +99,8 @@ public void EnterDialogueMode(TextAsset inkJSON)
     dialogueIsPlaying = true;
     dialoguePanel.SetActive(true);
 
+        dialogueVariables.StartListening(currentStory);
+
     //reset portrait, layout, and speaker
     displayNameText.text = "???";
     portraitAnimator.Play("default");
@@ -103,6 +113,8 @@ public void EnterDialogueMode(TextAsset inkJSON)
     private IEnumerator ExitDialogueMode()
     {
         yield return new WaitForSeconds(0.2f);
+
+        dialogueVariables.StopListening(currentStory);
 
         dialogueIsPlaying = false;
         dialoguePanel.SetActive(false);
@@ -278,6 +290,17 @@ public void EnterDialogueMode(TextAsset inkJSON)
             ContinueStory();
         }
         
+    }
+
+    public Ink.Runtime.Object GetVariableState(string variableName) 
+    { 
+        Ink.Runtime.Object variableValue = null;
+        dialogueVariables.variables.TryGetValue(variableName, out variableValue);
+        if (variableValue == null) 
+        {
+            Debug.LogWarning("Ink Variable was found to be null: " + variableName);
+        }
+        return variableValue;
     }
 
 }
