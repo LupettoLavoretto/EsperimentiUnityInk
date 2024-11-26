@@ -32,6 +32,7 @@ public class CharacterController2D : MonoBehaviour
 
     private void FixedUpdate()
     {
+        //Questa cosa fa sì che se il dialogo è in corso, allora "return" evita di passare al passaggio successivo, che permette al PG di muoversi.
         if (DialogueManager.GetInstance().dialogueIsPlaying)
         {
             return;

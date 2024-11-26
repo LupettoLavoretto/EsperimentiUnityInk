@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using Ink.Runtime;
 using UnityEngine;
 
-
+//Tutto questo bloccone serve per tracciare le variabili in ink e riportarle a unity tramite C#
 public class DialogueVariables
 {
+    //Se ho inteso bene, il dizionario serve per raccogliere tutte le definizioni, le variabili in ink, così poi sappiamo cosa aggiornare o meno.
     public Dictionary<string, Ink.Runtime.Object> variables { get; private set; }
 
     public Story globalVariablesStory;

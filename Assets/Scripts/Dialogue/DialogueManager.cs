@@ -7,109 +7,117 @@ using UnityEngine.EventSystems;
 
 public class DialogueManager : MonoBehaviour
 {
+//Bloccone di parametri vari
+    [Header("Parametri")]
+    //Questo definisce il ritmo di comparsa delle singole lettere
+    [SerializeField] private float typingSpeed = 0.04f;
 
-[Header("Parametri")]
-[SerializeField] private float typingSpeed = 0.04f;
+    //Questo ci serve per avere un tracciamento di tutte le variabili che sia sempre accessibile
+    [Header("Load Globals JSON")]
+    [SerializeField] private TextAsset loadGlobalsJSON;
 
-[Header("Load Globals JSON")]
-[SerializeField] private TextAsset loadGlobalsJSON;
+    //Qui definiamo gli elementi della User Interface
+    [Header("Dialogue UI")]
+    [SerializeField] private GameObject dialoguePanel;
+    [SerializeField] private GameObject continueIcon;
 
-[Header("Dialogue UI")]
-[SerializeField] private GameObject dialoguePanel;
-[SerializeField] private GameObject continueIcon;
+    [SerializeField] private TextMeshProUGUI dialogueText;
+    [SerializeField] private TextMeshProUGUI displayNameText;
+    [SerializeField] private Animator portraitAnimator;
 
-[SerializeField] private TextMeshProUGUI dialogueText;
-[SerializeField] private TextMeshProUGUI displayNameText;
-[SerializeField] private Animator portraitAnimator;
-private Animator layoutAnimator;
+    [Header("Choices UI")]
+    [SerializeField] private GameObject[] choices;
 
-[Header("Choices UI")]
-[SerializeField] private GameObject[] choices;
-private TextMeshProUGUI[] choicesText;
+    //Variabili varie
+    private TextMeshProUGUI[] choicesText;
 
-private Story currentStory;
+    private Animator layoutAnimator;
 
-public bool dialogueIsPlaying {get; private set;}
+    private Story currentStory;
 
-private bool canContinueToNextLine = false;
+    public bool dialogueIsPlaying {get; private set;}
 
-private const string SPEAKER_TAG = "speaker";
-private const string PORTRAIT_TAG = "portrait";
-private const string LAYOUT_TAG = "layout";
+    private bool canContinueToNextLine = false;
+
+    private const string SPEAKER_TAG = "speaker";
+    private const string PORTRAIT_TAG = "portrait";
+    private const string LAYOUT_TAG = "layout";
 
     private DialogueVariables dialogueVariables;
 
-private Coroutine displayLineCoroutine;
+    private Coroutine displayLineCoroutine;
 
-private static DialogueManager instance;
+    private static DialogueManager instance;
+
+
 private void Awake()
-{
-    if(instance != null)
     {
-        Debug.LogWarning("Trovati più di un Dialogue Manager nella scena");
-    }
-    instance = this;
+        if(instance != null)
+        {
+            Debug.LogWarning("Trovati più di un Dialogue Manager nella scena");
+        }
+        instance = this;
 
-        dialogueVariables = new DialogueVariables(loadGlobalsJSON);
-}
+            dialogueVariables = new DialogueVariables(loadGlobalsJSON);
+    }
 
 public static DialogueManager GetInstance()
-{
-    return instance;
-}
+    {
+        return instance;
+    }
 
 private void Start()
-{
-    dialogueIsPlaying = false;
-    dialoguePanel.SetActive(false);
-
-    //get the Layout Animator
-    layoutAnimator = dialoguePanel.GetComponent<Animator>();
-    //prendi tutte le scelte testuali
-    choicesText = new TextMeshProUGUI[choices.Length];
-    int index = 0;
-    foreach (GameObject choice in choices)
     {
-        choicesText[index] = choice.GetComponentInChildren<TextMeshProUGUI>();
-        index ++;
-    }
+        dialogueIsPlaying = false;
+        dialoguePanel.SetActive(false);
 
-}
+        //get the Layout Animator
+        layoutAnimator = dialoguePanel.GetComponent<Animator>();
+        //prendi tutte le scelte testuali
+        choicesText = new TextMeshProUGUI[choices.Length];
+        int index = 0;
+        foreach (GameObject choice in choices)
+        {
+            choicesText[index] = choice.GetComponentInChildren<TextMeshProUGUI>();
+            index ++;
+        }
+
+    }
 
 private void Update()
-{
-    if (!dialogueIsPlaying)
     {
-        return;
+        if (!dialogueIsPlaying)
+        {
+            return;
+        }
+        //Se la giocatrice clicca il tasto per avanzare, la storia avanza
+        if (canContinueToNextLine && 
+        currentStory.currentChoices.Count ==0 
+        && InputManager.GetInstance().GetSubmitPressed())
+        {
+            ContinueStory();
+        }
     }
-    //Se la giocatrice clicca il tasto per avanzare, la storia avanza
-    if (canContinueToNextLine && 
-    currentStory.currentChoices.Count ==0 
-    && InputManager.GetInstance().GetSubmitPressed())
-    {
-        ContinueStory();
-    }
-}
 
 public void EnterDialogueMode(TextAsset inkJSON)
-{
-    //Qui diciamo ad Unity che quando entriamo in modalità "dialogo" la storia deve venire dal JSON di ink, che il dialogo è attivo e il panel visibile (l'interfaccia dove compare il testo)
-    currentStory = new Story(inkJSON.text);
-    dialogueIsPlaying = true;
-    dialoguePanel.SetActive(true);
+    {
+        //Qui diciamo ad Unity che quando entriamo in modalità "dialogo" la storia deve venire dal JSON di ink, che il dialogo è attivo e il panel visibile (l'interfaccia dove compare il testo)
+        currentStory = new Story(inkJSON.text);
+        dialogueIsPlaying = true;
+        dialoguePanel.SetActive(true);
 
-        dialogueVariables.StartListening(currentStory);
+            dialogueVariables.StartListening(currentStory);
 
-    //reset portrait, layout, and speaker
-    displayNameText.text = "???";
-    portraitAnimator.Play("default");
-    layoutAnimator.Play("right");
+        //reset portrait, layout, and speaker
+        displayNameText.text = "???";
+        portraitAnimator.Play("default");
+        layoutAnimator.Play("right");
 
 
-    ContinueStory();
+        ContinueStory();
 
-}
-    private IEnumerator ExitDialogueMode()
+    }
+private IEnumerator ExitDialogueMode()
     {
         yield return new WaitForSeconds(0.2f);
 
@@ -120,7 +128,7 @@ public void EnterDialogueMode(TextAsset inkJSON)
         dialogueText.text = "";
     }
 
-    private void ContinueStory()
+private void ContinueStory()
     {
             if (currentStory.canContinue)
     {
@@ -144,7 +152,7 @@ public void EnterDialogueMode(TextAsset inkJSON)
     }
     }
 
-    private IEnumerator DisplayLine(string line)
+private IEnumerator DisplayLine(string line)
     {
         //empty the dialogue text
         dialogueText.text = line;
@@ -196,7 +204,7 @@ public void EnterDialogueMode(TextAsset inkJSON)
 
     }
 
-    private void HideChoices()
+private void HideChoices()
     {
         foreach (GameObject choiceButton in choices)
         {
@@ -204,7 +212,7 @@ public void EnterDialogueMode(TextAsset inkJSON)
         }
     }
 
-    private void HandleTags(List<string> currentTags)
+private void HandleTags(List<string> currentTags)
     {
         //Looppa per ogni tag e gestiscili di conseguenza
         foreach (string tag in currentTags)
@@ -244,7 +252,7 @@ public void EnterDialogueMode(TextAsset inkJSON)
     }
 
 
-    private void DisplayChoices()
+private void DisplayChoices()
     {
         List<Choice> currentChoices = currentStory.currentChoices;
 
@@ -272,7 +280,7 @@ public void EnterDialogueMode(TextAsset inkJSON)
 
     }
 
-    private IEnumerator SelectFirstChoice()
+private IEnumerator SelectFirstChoice()
     {
         //Event System richiede in unity prima di essere svuotato, e poi di aspettare prima di attivare un nuovo elemento
         EventSystem.current.SetSelectedGameObject(null);
@@ -281,7 +289,7 @@ public void EnterDialogueMode(TextAsset inkJSON)
 
     }
 
-    public void MakeChoice(int choiceIndex)
+public void MakeChoice(int choiceIndex)
     {
         if (canContinueToNextLine)
         {
@@ -292,7 +300,7 @@ public void EnterDialogueMode(TextAsset inkJSON)
         
     }
 
-    public Ink.Runtime.Object GetVariableState(string variableName) 
+public Ink.Runtime.Object GetVariableState(string variableName) 
     { 
         Ink.Runtime.Object variableValue = null;
         dialogueVariables.variables.TryGetValue(variableName, out variableValue);
@@ -303,7 +311,7 @@ public void EnterDialogueMode(TextAsset inkJSON)
         return variableValue;
     }
 
-    public void OnApplicationQuit()
+public void OnApplicationQuit()
     {
         if (dialogueVariables != null) {
             dialogueVariables.SaveVariables();
