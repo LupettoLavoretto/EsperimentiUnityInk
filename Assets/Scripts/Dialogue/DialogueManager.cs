@@ -45,6 +45,8 @@ public class DialogueManager : MonoBehaviour
 
     private DialogueVariables dialogueVariables;
 
+    private InkExternalFunctions inkExternalFunctions;
+
     private Coroutine displayLineCoroutine;
 
     private static DialogueManager instance;
@@ -59,6 +61,8 @@ private void Awake()
         instance = this;
 
             dialogueVariables = new DialogueVariables(loadGlobalsJSON);
+
+            inkExternalFunctions = new InkExternalFunctions();
     }
 
 public static DialogueManager GetInstance()
@@ -107,18 +111,10 @@ public void EnterDialogueMode(TextAsset inkJSON, Animator emoteAnimator)
         dialoguePanel.SetActive(true);
 
             dialogueVariables.StartListening(currentStory);
+            inkExternalFunctions.Bind(currentStory, emoteAnimator);
 
-            currentStory.BindExternalFunction("playEmote", (string emoteName) =>
-            {   if(emoteAnimator != null)
-            {
-                emoteAnimator.Play(emoteName);
-            }
-            else
-            {
-                Debug.LogWarning("Tried to play emote, but emote animator was not initialized when entering dialogue mode");
-            }
-                
-            });
+
+
 
         //reset portrait, layout, and speaker
         displayNameText.text = "???";
@@ -134,7 +130,8 @@ private IEnumerator ExitDialogueMode()
         yield return new WaitForSeconds(0.2f);
 
         dialogueVariables.StopListening(currentStory);
-        currentStory.UnbindExternalFunction("playEmote");
+        inkExternalFunctions.UnBind(currentStory);
+
 
         dialogueIsPlaying = false;
         dialoguePanel.SetActive(false);

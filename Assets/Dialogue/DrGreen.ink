@@ -1,4 +1,5 @@
-EXTERNAL playEmote(emoteName)
+INCLUDE globals.ink
+
 ~ playEmote("exclamation")
 
 Hello there! #speaker:Dr.Green #portrait: dr_green_neutral #layout:left
