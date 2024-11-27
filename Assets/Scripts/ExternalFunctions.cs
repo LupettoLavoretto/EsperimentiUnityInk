@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Ink.Runtime;
 
-public class ExternalFunctions
+public class InkExternalFunctions
 {
     public void Bind (Story story, Animator emoteAnimator)
     {

@@ -1,7 +1,5 @@
 INCLUDE globals.ink
 
-
-
 { pokemon_name == "": -> main| -> alredy_chose}
 
 === main ===
@@ -19,7 +17,6 @@ Which pokemon do you choose? #speaker:Ms.Yellow #portrait: ms_yellow_happy #layo
 === chosen(pokemon) ===
 ~ pokemon_name = pokemon
 You chose {pokemon}! #speaker:Ms.Yellow #portrait: ms_yellow_happy #layout:left
-+ [Charmander]
 -> END
 
 === alredy_chose ===

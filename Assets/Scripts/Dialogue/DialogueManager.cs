@@ -130,7 +130,7 @@ private IEnumerator ExitDialogueMode()
         yield return new WaitForSeconds(0.2f);
 
         dialogueVariables.StopListening(currentStory);
-        inkExternalFunctions.UnBind(currentStory);
+        inkExternalFunctions.Unbind(currentStory);
 
 
         dialogueIsPlaying = false;
